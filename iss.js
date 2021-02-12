@@ -56,4 +56,33 @@ const fetchISSFlyOverTimes = function(coords, callback) {
   });
 };
 
-module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes };
+// Calling nextISSTimesForMyLocation
+const nextISSTimesForMyLocation = (callback) => {
+  fetchMyIP((error, ip) => {
+    if (error) {
+      return callback(error, null);
+    }
+    fetchCoordsByIP(ip,(error, coordinates) => {
+      if (error) {
+        return callback(error, null);
+      }
+      fetchISSFlyOverTimes(coordinates, (error, flyTimes) => {
+        if (error) {
+          return callback(error, null);
+        }
+        for (const times of flyTimes) {
+
+          const unixTime = times.risetime;
+          const datetime = new Date(0);
+          datetime.setUTCSeconds(unixTime);
+          const duration = times.duration;
+
+          console.log(`Next Pass at ${datetime} for ${times.duration} seconds`);
+          console.log("===========================================================================================");
+        }
+      });
+    });
+  });
+};
+
+module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes, nextISSTimesForMyLocation };
